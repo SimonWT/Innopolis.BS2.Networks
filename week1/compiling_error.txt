@@ -1,0 +1,28 @@
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c: In function 'client':
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c:109:26: warning: passing argument 2 of 'write' makes pointer from integer without a cast [-Wint-conversion]
+         write(pipefd[1], comm, 1);
+                          ^~~~
+In file included from c:\mingw\include\unistd.h:56:0,
+                 from C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c:2:
+c:\mingw\include\io.h:668:38: note: expected 'const void *' but argument is of type 'int'
+ _CRTIMP __cdecl __MINGW_NOTHROW  int write (int, const void*, unsigned int);
+                                      ^~~~~
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c: In function 'server':
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c:116:25: warning: passing argument 2 of 'read' makes pointer from integer without a cast [-Wint-conversion]
+         read(pipefd[0], buf[0], 1);
+                         ^~~
+In file included from c:\mingw\include\unistd.h:56:0,
+                 from C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c:2:
+c:\mingw\include\io.h:662:38: note: expected 'void *' but argument is of type 'char'
+ _CRTIMP __cdecl __MINGW_NOTHROW  int read (int, void*, unsigned int);
+                                      ^~~~
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c: In function 'main':
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c:130:9: warning: implicit declaration of function 'pipe' [-Wimplicit-function-declaration]
+         pipe(pipefd);
+         ^~~~
+C:\Users\simon\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home\Networks\week1\ex.c:132:15: warning: implicit declaration of function 'fork' [-Wimplicit-function-declaration]
+         pid = fork();
+               ^~~~
+C:\Users\simon\AppData\Local\Temp\cci8wgpU.o:ex.c:(.text+0x3a2): undefined reference to `pipe'
+C:\Users\simon\AppData\Local\Temp\cci8wgpU.o:ex.c:(.text+0x3a7): undefined reference to `fork'
+collect2.exe: error: ld returned 1 exit status

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 struct stack {
         int data[50];
@@ -62,128 +63,100 @@ void display(struct stack *stack){
 
 int validate(char buf[], int* arg){
         int i=0;
-        char com[10];
         int command_num=0;
-        int arg_chars[100];
-
-        printf("%s  -  %i \n",buf,  strlen(buf));
-
-        while(buf[i]!=' ' && buf[i]!=EOF && (strlen(buf) > i )) {
-                com[i] = buf[i];
-                i++;
-        }
-
-        printf("Validate: %s\n", com );
 
         //compare strings
-        if(strcmp(com, "push")==0) {
+        if(strcmp(buf, "push")==0) {
                 command_num = 1;
-        }else if(strcmp(com, "peek")==0) {
+        }else if(strcmp(buf, "peek")==0) {
                 command_num = 2;
-        }else if(strcmp(com, "display")==0) {
+        }else if(strcmp(buf, "display")==0) {
                 command_num = 3;
-        }else if(strcmp(com, "empty")==0) {
+        }else if(strcmp(buf, "empty")==0) {
                 command_num = 4;
-        }else if(strcmp(com, "create")==0) {
+        }else if(strcmp(buf, "create")==0) {
                 command_num = 5;
-        }else if(strcmp(com, "stack_size")==0) {
+        }else if(strcmp(buf, "stack_size")==0) {
                 command_num = 6;
-        }else if(strcmp(com, "pop")==0) {
+        }else if(strcmp(buf, "pop")==0) {
                 command_num = 7;
         }else{
                 printf("[Error]: Unknown command\n");
         }
-
-        //strcmp()
-        if(strlen(buf)>=i) {
-                i++;
-                int j = 0;
-                while(strlen(buf)>i) {
-                        arg_chars[j] = buf[i];
-                        i++;
-                        j++;
-                }
-        }
-
-        *arg = atoi(arg_chars);
         return command_num;
 }
 
-void client(int pipefd[]){
+
+
+void server(int pipefd[], int parent_pid){
+        char buf;
+        close(pipefd[1]);
+
+        while(1) {
+                pause();
+                printf("Server...........\n");
+                read(pipefd[0], buf, 1);
+                int comm = atoi(buf);
+                printf("Recived comm = %i; Char = %c\n", comm, buf );
+                int arg;
+
+                //Stack
+                struct stack stack;
+                stack.capacity = 0;
+
+                switch ( comm ) {
+                case 1:
+                        printf("what to push?: \n");
+                        scanf("%i\n", arg);
+                        printf("Pushing: %i»\n", arg);
+                        push(&stack, arg);
+                        break;
+                case 2:
+                        printf("Peek: %i\n", peek(&stack));
+                        break;
+                case 3:
+                        display(&stack);
+                        break;
+                case 4:
+                        printf( "is Empty? %i\n", empty(&stack));
+                        break;
+                case 5:
+                        printf( "Create stack...\n");
+                        create(&stack);
+                        break;
+                case 6:
+                        printf( "Stack size: %i\n", stack_size(&stack));
+                        break;
+                case 7:
+                        printf( "Pop: %i\n", peek(&stack));
+                        pop(&stack);
+                        break;
+                default:
+                        printf( "Неправильный ввод.\n" );
+                }
+                kill( parent_pid, SIGCONT );
+        }
+}
+
+void client(int pipefd[], int child_pid){
         //reading commands
         char buf[50];
         int comm;
         int arg;
         char pipebuf[50];
-
         close(pipefd[0]);
-        printf("Enter your command: \n");
+        while(1) {
+                printf("Enter your command: \n");
 
-        scanf("%s", buf);
-        printf("Scanned: %s\n", buf );
-        comm = validate(buf, &arg);
-        printf("Comm num = %i\n", comm);
-        write(pipefd[1], comm, 1);
-        write(pipefd[1], arg, 4);
+                scanf("%s", buf);
+                printf("Scanned: %s\n", buf );
+                comm = validate(buf, &arg);
+                printf("Comm num = %i\n", comm);
 
-}
-
-void server(int pipefd[]){
-
-        char buf[50];
-        close(pipefd[1]);
-        read(pipefd[0], buf, 50);
-        int comm = atoi(buf[0]);
-        int arg;
-        char arg_chars[49];
-
-        //Stack
-        struct stack stack;
-        stack.capacity = 0;
-
-        int i=0;
-        if(strlen(buf)>=i) {
-                i++;
-                int j = 0;
-                while(strlen(buf)>i) {
-                        arg_chars[j] = buf[i];
-                        i++;
-                        j++;
-                }
+                write(pipefd[1], comm, 1);
+                pause();
         }
 
-        arg = atoi(arg_chars);
-        printf("arg = %i\n",arg);
-        switch ( comm ) {
-        case 1:
-                printf("Pushing: %i»\n", arg);
-                push(&stack, arg);
-                break;
-        case 2:
-                printf("Peek: %i\n", peek(&stack));
-                break;
-        case 3:
-                display(&stack);
-                break;
-        case 4:
-                printf( "is Empty? %i\n", empty(&stack));
-                break;
-        case 5:
-                printf( "Create stack...\n");
-                create(&stack);
-                break;
-        case 6:
-                printf( "Stack size: %i\n", stack_size(&stack));
-                break;
-        case 7:
-                printf( "Pop: %i\n", peek(&stack));
-                pop(&stack);
-                break;
-        default:
-                printf( "Неправильный ввод.\n" );
-        }
-
-        //printf("Recived: %c\n", buf[0]);
 }
 
 
@@ -198,12 +171,12 @@ int main(){
         if(pid!=0) {
                 //parent
                 printf("hello, im parent\n");
-                client(pipefd);
+                client(pipefd, pid);
 
         }else{
                 //child
                 printf("hello, im child\n");
-                server(pipefd);
+                server(pipefd, getpid());
         }
         return 0;
 }

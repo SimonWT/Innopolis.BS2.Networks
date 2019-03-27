@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #define MAX_WORD_LENGTH 20
 
@@ -25,7 +26,6 @@ void *get_in_addr(struct sockaddr *sa)
 	if (sa->sa_family == AF_INET) {
 		return &(((struct sockaddr_in*)sa)->sin_addr);
 	}
-
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
@@ -99,6 +99,44 @@ char* my_ip(){
     return ip;
 }
 
+// void server()
+
+// void node(char name[]){
+
+// 			int master_sock_tcp_fd = 0,
+//        sent_recv_bytes = 0,
+//        addr_len = 0,
+//        opt = 1;
+
+			 
+
+// 			 int comm_socket_fd = 0;
+// 			 if ((master_sock_tcp_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP )) == -1){	
+// 				printf("socket creation failed\n");
+// 				exit(1);
+// 			 }
+
+// 				/*Step 3: specify server Information*/
+// 				server_addr.sin_family = AF_INET;/*This socket will process only ipv4 network packets*/
+// 				server_addr.sin_port = SERVER_PORT;/*Server will process any data arriving on port no 2000*/
+
+// 				server_addr.sin_addr.s_addr = INADDR_ANY;
+
+// 				addr_len = sizeof(struct sockaddr);
+
+// 				if (bind(master_sock_tcp_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1)
+// 				{
+// 						printf("socket bind failed\n");
+// 						return;
+// 				}
+				
+// 				//Создаём тред который слушай на синхрон
+// 				//Создаём тред который идет по бд и отправляет сигнал на синхрон
+// 				//Создаём тред который запрашивает файлы (в Гуи)
+
+// }
+
+//
 void
 tcp_server(char name[]){
 
@@ -107,13 +145,11 @@ tcp_server(char name[]){
        addr_len = 0,
        opt = 1;
 
-   
-   int comm_socket_fd = 0;
-   
    fd_set readfds;
    struct sockaddr_in server_addr, /*structure to store the server and client info*/
                       client_addr;
 
+	  int comm_socket_fd = 0;
    if ((master_sock_tcp_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP )) == -1)
    {
        printf("socket creation failed\n");
@@ -187,7 +223,6 @@ tcp_server(char name[]){
                		close(comm_socket_fd);
                		break;
                }
-
 
 							//If recieved 0, then Client will send inoformation about him and his peers in db
 							if (sig == 1){
@@ -267,10 +302,8 @@ tcp_server(char name[]){
    }
 }
 
-
 ///////////// CLIENT /////////////////////
 void tcp_client(char name[], char server_ip[], int server_port, int sig) {
-		
     int sockfd = 0,
         sent_recv_bytes = 0;
 
@@ -402,6 +435,7 @@ void tcp_client(char name[], char server_ip[], int server_port, int sig) {
 			}
 
     }
+	 exit(0);
 }
 
 int
@@ -414,12 +448,9 @@ main(int argc, char **argv){
 		 	scanf(" %[^\n]", name);
 			printf("Run Peer as Server or as Client??\nwrite 'c' for client, 's' for the server\n");
 
-			scanf("%c", &peer);
+			scanf(" %c", &peer);
 
-   
-
-			if(peer == 'c'){
-					printf("Please enter NAME: \n");
+			if(peer == 'c'){			
 				
 					printf("Please enter IP of your potential connection partner\n");
 					char IP[16];

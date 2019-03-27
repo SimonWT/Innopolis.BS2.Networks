@@ -29,9 +29,9 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-int amount_of_words(char* filename)
+int numWordsInFile(char* filename)
 {
-    FILE * fp = fopen(filename, "r");
+  FILE * fp = fopen(filename, "r");
 	if (fp == NULL) return 1;
 	char c;
 	int count = 0;
@@ -46,32 +46,32 @@ int amount_of_words(char* filename)
     return (count + 1);
 }
 
-char** convert_text_to_array(char* filename){
-    int size = amount_of_words(filename);
+char** fileToArray(char* filename){
+    int size = numWordsInFile(filename);
     FILE * fp = fopen(filename, "r");
     char **data = (char **)malloc(size * sizeof(char *));
 		int i;
     for (i = 0; i < size; i++)
          data[i] = (char *)malloc(MAX_WORD_LENGTH * sizeof(int));
-	if (fp == NULL) return 1;
-	char c;
-	int count = 0;
-  i = -1;
-	while((c = fgetc(fp)) != EOF)
-	{
-		if(c == ' ' || c == '\n')
+		if (fp == NULL) return 1;
+		char c;
+		int count = 0;
+		i = -1;
+		while((c = fgetc(fp)) != EOF)
 		{
-            data[count][++i] = '\0';
-            count++;
-            i = -1;
+			if(c == ' ' || c == '\n')
+			{
+							data[count][++i] = '\0';
+							count++;
+							i = -1;
+			}
+			else
+			{
+							data[count][++i] = c;
+			}
 		}
-		else
-		{
-            data[count][++i] = c;
-		}
-	}
-	fclose(fp);
-    return data;
+		fclose(fp);
+		return data;
 }
 
 char* my_ip(){
@@ -100,7 +100,7 @@ char* my_ip(){
 }
 
 
-//
+
 void
 tcp_server(char name[]){
 
@@ -240,8 +240,8 @@ tcp_server(char name[]){
 								 char **data;
 
 								 if(fp != NULL){
-									 	msg = amount_of_words(text_file);
-										data = convert_text_to_array(text_file); 
+									 	msg = numWordsInFile(text_file);
+										data = fileToArray(text_file); 
 								 }else{
 									 printf("hasn't this file: %s\n", text_file);
 								 }
@@ -338,13 +338,13 @@ void tcp_client(char name[], char server_ip[], int server_port, int sig) {
 					printf("Sended: %s | No of bytes sent = %d\n", my_info, sent_recv_bytes);
 					
 					//Send number of nodes in your db to another peer
-					num_of_nodes = amount_of_words("db.txt");
+					num_of_nodes = numWordsInFile("db.txt");
 					snprintf(int_buf, 4, "%d", num_of_nodes);
 					sent_recv_bytes = send(sockfd, (char*)&int_buf, sizeof(int), 0);
 					printf("Sended: number of nodes = %d | No of bytes sent = %d\n", num_of_nodes, sent_recv_bytes);
 
 					//one by one send information about every node to the peer
-					char **data = convert_text_to_array("db.txt");
+					char **data = fileToArray("db.txt");
 					int i;
 					char peer[50];
 					printf("------------------\n");
@@ -416,14 +416,14 @@ main(int argc, char **argv){
 
 			if(peer == 'c'){			
 				
-					printf("Please enter IP of your potential connection partner\n");
+					printf("Enter IP of another peer\n");
 					char IP[16];
 					scanf(" %[^\n]", IP);
-					printf("Please enter PORT of your potential connection partner\n");
+					printf("Enter PORT of another peer\n");
 					int PORT;
 					scanf(" %d", &PORT);
 					int KEY;
-					printf("Sync or request file?([1] or [0])\n");
+					printf("SYNC or Request File? ~ '0' or '1'\n");
 					scanf(" %d", &KEY);
 					tcp_client(name, IP, PORT, KEY);
 			}

@@ -5,17 +5,14 @@
 #include <netdb.h>
 #include <memory.h>
 #include <errno.h>
-#include "common.h"
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 
 #define MAX_WORD_LENGTH 20
+
 /*Server process is running on this port no. Client has to send data to this port no*/
 #define SERVER_PORT  2003
 #define CLIENT_PORT  2077
-
-//Info for the CLient
-#define SERVER_IP_ADDRESS "192.168.4.2"
 
 #define FILENAME_REQUEST "test2.txt"
 #define FILENAME   "----test.txt"
@@ -306,8 +303,6 @@ void tcp_client(char name[], char server_ip[], int server_port, int sig) {
 		char* myIP = my_ip();
 		char data_buffer[1024];
 
-    while(1) {
-
 			char request_file[9] = "test.txt";
 			char answer[6];
 
@@ -368,18 +363,14 @@ void tcp_client(char name[], char server_ip[], int server_port, int sig) {
 					printf("------------------\n");
 
 			}else if (sig == req_file){
-					//client_request_file(sockfd, FILENAME);
-					int num_of_words = 0;
-					// sleep(1);
-					// sent_recv_bytes = send(sockfd, &request_file, sizeof(request_file), 0);
-	    		// printf("Requested: %s | No of bytes sent = %d\n", request_file, sent_recv_bytes);
 
+					int num_of_words = 0;
+				
 					char send_msg[100];
-  				// printf("check if server has file\n");
 
   				strcpy(send_msg, FILENAME);
  					sent_recv_bytes = send(sockfd, &send_msg, sizeof(send_msg), 0);
-					 printf("Requested: %s | No of bytes sent = %d\n", FILENAME, sent_recv_bytes);
+					printf("Requested: %s | No of bytes sent = %d\n", FILENAME, sent_recv_bytes);
 				
 					sent_recv_bytes = recv(sockfd, (char *)data_buffer, sizeof(data_buffer), 0);\
 					num_of_words = atoi(data_buffer);
@@ -407,11 +398,7 @@ void tcp_client(char name[], char server_ip[], int server_port, int sig) {
 							fclose(fp); //close the file
 							printf("----------\n");
 
-							printf("TRANSFER COMPLETE \n");
-							sleep(10);
-					
-					}
-			
+							printf("TRANSFER COMLETE. \n");
 			}
 
     }
@@ -422,33 +409,32 @@ main(int argc, char **argv){
 
 	 char name[100] = "Default";
 	 char peer;
-
 	 printf("Name of peer: ");
-	 //scanf("%s", &name);
-	 printf("Run Peer as Server or as Client??\nwrite 'c' for client, 's' for the server\n");
+	 while(1){
+		 	scanf(" %[^\n]", name);
+			printf("Run Peer as Server or as Client??\nwrite 'c' for client, 's' for the server\n");
 
-   scanf("%c", &peer);
+			scanf("%c", &peer);
 
-   while(1){
+   
 
-    if(peer == 'c'){
-
-				printf("Please enter NAME: \n");
-				scanf(" %[^\n]", name);
-				printf("Please enter IP of your potential connection partner\n");
-				char IP[16];
-				scanf(" %[^\n]", IP);
-				printf("Please enter PORT of your potential connection partner\n");
-				int PORT;
-				scanf(" %d", &PORT);
-				int KEY;
-				printf("Sync or request file?([1] or [0])\n");
-				scanf(" %d", &KEY);
-				tcp_client(name, IP, PORT, KEY);
-     }
-    else if (peer = 's'){
-       tcp_server(name);
-     }
+			if(peer == 'c'){
+					printf("Please enter NAME: \n");
+				
+					printf("Please enter IP of your potential connection partner\n");
+					char IP[16];
+					scanf(" %[^\n]", IP);
+					printf("Please enter PORT of your potential connection partner\n");
+					int PORT;
+					scanf(" %d", &PORT);
+					int KEY;
+					printf("Sync or request file?([1] or [0])\n");
+					scanf(" %d", &KEY);
+					tcp_client(name, IP, PORT, KEY);
+			}
+			else if (peer = 's'){
+				tcp_server(name);
+			}
    }
    return 0;
 }

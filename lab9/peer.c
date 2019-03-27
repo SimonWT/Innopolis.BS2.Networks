@@ -18,6 +18,7 @@
 #define SERVER_IP_ADDRESS "192.168.4.2"
 
 #define FILENAME_REQUEST "test2.txt"
+#define FILENAME   "----test.txt"
 
 #define DB_NAME "db2.txt"
 
@@ -104,7 +105,6 @@ char* my_ip(){
 void
 tcp_server(char name[]){
 
-  
    int master_sock_tcp_fd = 0,
        sent_recv_bytes = 0,
        addr_len = 0,
@@ -194,14 +194,18 @@ tcp_server(char name[]){
 
 							//If recieved 0, then Client will send inoformation about him and his peers in db
 							if (sig == 1){
+
 								 FILE* dbp = fopen(DB_NAME, "a"); //create new file and open	
 								 memset(data_buffer, 0, sizeof(data_buffer));
 								 //His info
+								 char his_info[50];
 							   sent_recv_bytes = recv(comm_socket_fd, (char *)data_buffer, sizeof(data_buffer), 0);
+								 strcpy(his_info, data_buffer);
+								 strcat(his_info, "\n");
 								 printf("Recived: %s | Bytes: %i\n", data_buffer, sent_recv_bytes);
-								 fputs(dbp, data_buffer);	
-								 char int_buff[20];
+								 fputs(his_info, dbp);	
 
+								 char int_buff[20];
 								 //Number of peers in db
 							   sent_recv_bytes = recv(comm_socket_fd, (char *)int_buff, sizeof(int), 0);
 								 int num_nodes = atoi(int_buff);
@@ -223,12 +227,14 @@ tcp_server(char name[]){
 								 	 printf("------------\n");
 							 	
 							}else if (sig == 0){
-								 char text_file[25];
+								//server_send_file(comm_socket_fd);
+								 char text_file[50];
 								 printf("Request for sending file RECIEVED\n");	
 
-								 sent_recv_bytes = recv(comm_socket_fd, (char *)text_file, sizeof(text_file), 0);
+								 sent_recv_bytes = recv(comm_socket_fd, (char *)data_buffer, sizeof(data_buffer), 0);
+								 strcpy(text_file, data_buffer);
 								 printf("Recived: %s | Bytes: %i\n", text_file, sent_recv_bytes);
-								 
+								 //strcat(text_file, ".txt");
 							  //  strcpy(text_file, data_buffer);
 
 								 FILE* fp = fopen(text_file, "r");
@@ -243,7 +249,7 @@ tcp_server(char name[]){
 								 }else{
 									 printf("hasn't this file: %s\n", text_file);
 								 }
-
+								 
 								 printf("-------------\n");
 								 snprintf(str_msg, sizeof(int), "%d", msg);
 								 sent_recv_bytes = send(comm_socket_fd, &str_msg, sizeof(int), 0);	
@@ -253,7 +259,8 @@ tcp_server(char name[]){
 								 for(i =0; (fp!=NULL && i< msg); i++){
 									 strcpy(word, data[i]);
 									 sent_recv_bytes = send(comm_socket_fd, &word, sizeof(word), 0);
-									 printf("Sended: %s | Bytes: %d", word, sent_recv_bytes);	
+									 printf("Sended: %s | Bytes: %d\n", word, sent_recv_bytes);	
+									 sleep(1);
 								 }
 								 printf("-------------\n");	
 								 fclose(fp);
@@ -265,7 +272,7 @@ tcp_server(char name[]){
 
 
 ///////////// CLIENT /////////////////////
-void tcp_client(char name[]) {
+void tcp_client(char name[], char server_ip[], int server_port, int sig) {
 		
     int sockfd = 0,
         sent_recv_bytes = 0;
@@ -278,7 +285,7 @@ void tcp_client(char name[]) {
     dest.sin_family = AF_INET;
 
     dest.sin_port = SERVER_PORT;
-		struct hostent *host = (struct hostent *)gethostbyname(SERVER_IP_ADDRESS);
+		struct hostent *host = (struct hostent *)gethostbyname(server_ip);
     dest.sin_addr = *((struct in_addr *)host->h_addr);
 		
     sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -305,7 +312,7 @@ void tcp_client(char name[]) {
 			char answer[6];
 
 			int sync = 1;
-			int sig = 0;
+			
 			int req_file = 0;
 			int num_of_nodes=0;
 			int int_buf[20];
@@ -361,17 +368,25 @@ void tcp_client(char name[]) {
 					printf("------------------\n");
 
 			}else if (sig == req_file){
+					//client_request_file(sockfd, FILENAME);
 					int num_of_words = 0;
-					sleep(1);
-					sent_recv_bytes = send(sockfd, &request_file, sizeof(request_file), 0);
-	    		printf("Requested: %s | No of bytes sent = %d\n", request_file, sent_recv_bytes);
+					// sleep(1);
+					// sent_recv_bytes = send(sockfd, &request_file, sizeof(request_file), 0);
+	    		// printf("Requested: %s | No of bytes sent = %d\n", request_file, sent_recv_bytes);
+
+					char send_msg[100];
+  				// printf("check if server has file\n");
+
+  				strcpy(send_msg, FILENAME);
+ 					sent_recv_bytes = send(sockfd, &send_msg, sizeof(send_msg), 0);
+					 printf("Requested: %s | No of bytes sent = %d\n", FILENAME, sent_recv_bytes);
 				
 					sent_recv_bytes = recv(sockfd, (char *)data_buffer, sizeof(data_buffer), 0);\
 					num_of_words = atoi(data_buffer);
 					printf("Recived: %d | Bytes: %d\n", num_of_words, sent_recv_bytes);
 					
 					//Compare OK with recieved message
-					if(num_of_nodes == -1 || num_of_nodes == 0){
+					if(num_of_words == -1 || num_of_words == 0){
 						printf("Server hasn't this file :(\n");
 						exit(-2);
 					}else{
@@ -383,17 +398,22 @@ void tcp_client(char name[]) {
 							char word[25];
 							for(i =0; i< num_of_words; i++){
 									memset(data_buffer, 0, sizeof(data_buffer));
-									sent_recv_bytes = recv(sockfd, (char *)data_buffer, sizeof(data_buffer), 0);
-									strcpy(word, data_buffer);
-									fputs(fp, word);
+									sent_recv_bytes = recv(sockfd, (char *)word, sizeof(word), 0);
+									//strcpy(word, data_buffer);
+									printf("Recived: %s | Bytes: %d\n", word, sent_recv_bytes);
+									fputs(word, fp);
+									if( i < num_of_words - 1) fputs(" ", fp);
 							}
-							close(fp); //close the file
+							fclose(fp); //close the file
 							printf("----------\n");
 
 							printf("TRANSFER COMPLETE \n");
 							sleep(10);
-				}
+					
+					}
+			
 			}
+
     }
 }
 
@@ -412,9 +432,21 @@ main(int argc, char **argv){
    while(1){
 
     if(peer == 'c'){
-       tcp_client(name);
+
+				printf("Please enter NAME: \n");
+				scanf(" %[^\n]", name);
+				printf("Please enter IP of your potential connection partner\n");
+				char IP[16];
+				scanf(" %[^\n]", IP);
+				printf("Please enter PORT of your potential connection partner\n");
+				int PORT;
+				scanf(" %d", &PORT);
+				int KEY;
+				printf("Sync or request file?([1] or [0])\n");
+				scanf(" %d", &KEY);
+				tcp_client(name, IP, PORT, KEY);
      }
-   else if (peer = 's'){
+    else if (peer = 's'){
        tcp_server(name);
      }
    }

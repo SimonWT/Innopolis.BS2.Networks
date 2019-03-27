@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+int MAX_WORD_LENGTH = 20;
+
+int amount_of_words(char* filename)
+{
+    FILE * fp = fopen(filename, "r");
+	if (fp == NULL) return 1;
+	char c;
+	int count = 0;
+	while((c = fgetc(fp)) != EOF)
+	{
+		if(c == ' ' || c == '\n')
+		{
+			++count;
+		}
+	}
+    fclose(fp);
+    return (count + 1);
+}
+
+char** convert_text_to_array(char* filename){
+    int size = amount_of_words(filename);
+    FILE * fp = fopen(filename, "r");
+    char **data = (char **)malloc(size * sizeof(char *)); 
+	int i;
+    for ( i=0; i<size; i++) 
+         data[i] = (char *)malloc(MAX_WORD_LENGTH * sizeof(int));
+	if (fp == NULL) return 1;
+	char c;
+	int count = 0;
+    i = -1;
+	while((c = fgetc(fp)) != EOF)
+	{
+		if(c == ' ' || c == '\n')
+		{
+            data[count][++i] = '\0';
+            count++;
+            i = -1;
+		}
+		else
+		{
+            data[count][++i] = c;
+		}
+	}
+	fclose(fp);
+    return data;
+}
+
+int main(int argc, char **argv){
+    
+    printf("%d", size);
+    char **data = convert_text_to_array("db.txt");
+	int i;
+    for (i= 0; i < size; i++){
+        printf("\n%s", data[i]);
+    }
+    printf("\n");
+	return 0;
+}

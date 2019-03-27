@@ -1,0 +1,4 @@
+C:\Users\simon\Documents\INNOPOLIS\BS2\Networks\Lab\lab5\client_udp.c:3:24: fatal error: sys/socket.h: No such file or directory
+ #include <sys/socket.h>
+                        ^
+compilation terminated.

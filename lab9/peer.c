@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
-#include <pthread.h>
+S#include <pthread.h>
 
 #define MAX_WORD_LENGTH 20
 

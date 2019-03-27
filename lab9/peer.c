@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
-S#include <pthread.h>
+#include <pthread.h>
 
 #define MAX_WORD_LENGTH 20
 
@@ -99,42 +99,6 @@ char* my_ip(){
     return ip;
 }
 
-// void server()
-
-// void node(char name[]){
-
-// 			int master_sock_tcp_fd = 0,
-//        sent_recv_bytes = 0,
-//        addr_len = 0,
-//        opt = 1;
-
-			 
-
-// 			 int comm_socket_fd = 0;
-// 			 if ((master_sock_tcp_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP )) == -1){	
-// 				printf("socket creation failed\n");
-// 				exit(1);
-// 			 }
-
-// 				/*Step 3: specify server Information*/
-// 				server_addr.sin_family = AF_INET;/*This socket will process only ipv4 network packets*/
-// 				server_addr.sin_port = SERVER_PORT;/*Server will process any data arriving on port no 2000*/
-
-// 				server_addr.sin_addr.s_addr = INADDR_ANY;
-
-// 				addr_len = sizeof(struct sockaddr);
-
-// 				if (bind(master_sock_tcp_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1)
-// 				{
-// 						printf("socket bind failed\n");
-// 						return;
-// 				}
-				
-// 				//Создаём тред который слушай на синхрон
-// 				//Создаём тред который идет по бд и отправляет сигнал на синхрон
-// 				//Создаём тред который запрашивает файлы (в Гуи)
-
-// }
 
 //
 void

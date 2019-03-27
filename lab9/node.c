@@ -14,7 +14,7 @@
 
 /*Server process is running on this port no. Client has to send data to this port no*/
 #define SERVER_PORT     2000 
-#define SERVER_IP_ADDRESS   "10.20.1.22"
+#define SERVER_IP_ADDRESS   "192.168.4.2"
 #define FILENAME   "file.txt"
 
 char data_buffer[1024];
@@ -38,11 +38,12 @@ char** words_from_file_to_array(char* filename){
   int size = compute_number_of_words(filename);
   FILE * fp = fopen(filename, "r");
   char **data = (char **)calloc(size, sizeof(char *)); 
-  for (int i=0; i<size; i++)  data[i] = (char *)calloc(30, sizeof(int));
+  int i;
+  for (i=0; i<size; i++)  data[i] = (char *)calloc(30, sizeof(int));
   if (fp == NULL) return (char **)1;
   char c;
   int count = 0;
-  int i = -1;
+  i = -1;
   while((c = fgetc(fp)) != EOF){
     if(c == ' ' || c == '\n'){
       data[count][++i] = '\0';

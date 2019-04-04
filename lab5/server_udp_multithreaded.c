@@ -18,10 +18,10 @@ test_struct_t test_struct;
 result_struct_t res_struct;
 
 struct thread_data {
-								int thread_id;
-								int sockfd;
-								char *data;
-								struct sockaddr_storage *their_addr;
+	int thread_id;
+	int sockfd;
+	char *data;
+	struct sockaddr_storage *their_addr;
 
 };
 
@@ -38,42 +38,42 @@ void *get_in_addr(struct sockaddr *sa)
 
 void *thread_processing(void *args){
 
-								char ipstring[INET6_ADDRSTRLEN];
-								struct thread_data *thread_data;
-								thread_data = (struct thread_data *)args;
+	char ipstring[INET6_ADDRSTRLEN];
+	struct thread_data *thread_data;
+	thread_data = (struct thread_data *)args;
 
-								int thread_id = thread_data->thread_id;
-								int sockfd = thread_data->sockfd;
-								struct sockaddr_storage their_addr;
-								their_addr = *thread_data->their_addr;
+	int thread_id = thread_data->thread_id;
+	int sockfd = thread_data->sockfd;
+	struct sockaddr_storage their_addr;
+	their_addr = *thread_data->their_addr;
 
-								//Notify info about thread_data
-								printf("[thread %i] Created \n", thread_id);
-								test_struct_t *client_data = (test_struct_t *)thread_data->data;
-								printf("[thread %i] Client info: IP= %s \n", thread_id, inet_ntop(their_addr.ss_family,
-																		get_in_addr((struct sockaddr *)&their_addr),ipstring, sizeof ipstring));
-								printf("[thread %i] Client data: Name= %s  Age= %s Group= %s \n", thread_id, client_data->name, client_data->age, client_data->group);
+	//Notify info about thread_data
+	printf("[thread %i] Created \n", thread_id);
+	test_struct_t *client_data = (test_struct_t *)thread_data->data;
+	printf("[thread %i] Client info: IP= %s \n", thread_id, inet_ntop(their_addr.ss_family,
+											get_in_addr((struct sockaddr *)&their_addr),ipstring, sizeof ipstring));
+	printf("[thread %i] Client data: Name= %s  Age= %s Group= %s \n", thread_id, client_data->name, client_data->age, client_data->group);
 
-								result_struct_t result;
+	result_struct_t result;
 
-								char tmp[160];
-								strcpy(tmp, client_data->name);
-								strcat(tmp, " ");
-								strcat(tmp, client_data->age);
-								strcat(tmp, " ");
-								strcat(tmp, client_data->group);
-								strcat(tmp, " ~ Horoshi Man");
-								strcpy(result.c, tmp);
+	char tmp[160];
+	strcpy(tmp, client_data->name);
+	strcat(tmp, " ");
+	strcat(tmp, client_data->age);
+	strcat(tmp, " ");
+	strcat(tmp, client_data->group);
+	strcat(tmp, " ~ Horoshi Man");
+	strcpy(result.c, tmp);
 
-								//Sleep 10 sec
-								sleep(10);
+	//Sleep 10 sec
+	sleep(10);
 
-								/* Server replying back to client now*/
-								int sent_recv_bytes = sendto(sockfd, (char *)&result, sizeof(result_struct_t), 0,
-																																					(struct sockaddr *)&their_addr, sizeof(struct sockaddr));
+	/* Server replying back to client now*/
+	int sent_recv_bytes = sendto(sockfd, (char *)&result, sizeof(result_struct_t), 0,
+																														(struct sockaddr *)&their_addr, sizeof(struct sockaddr));
 
-								printf("Server sent %d bytes in reply to client\n", sent_recv_bytes);
-							  pthread_exit(NULL);
+	printf("Server sent %d bytes in reply to client\n", sent_recv_bytes);
+	pthread_exit(NULL);
 }
 
 void

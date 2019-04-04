@@ -359,6 +359,7 @@ void* client_thread(void* args){
     //Залесть в бд и собрать и начать рассылать синхронусы
     //for(i = 0; i< num_peers; i++ )
     char server_ip[16] = "192.168.4.1";
+
     struct sockaddr_in dest;
     dest.sin_family = AF_INET;
     dest.sin_port = SERVER_PORT;
@@ -366,11 +367,15 @@ void* client_thread(void* args){
     dest.sin_addr = *((struct in_addr *)host->h_addr);
     printf("Это тоже робит");
 
-    //connect(sockfd, (struct sockaddr *)&dest, sizeof(struct sockaddr));
+
+    connect(sockfd, (struct sockaddr *)&dest, sizeof(struct sockaddr));
+    client_sync("YAR", sockfd);
 
 	char data_buffer[1024];
 
+
     pthread_exit(NULL);
+
 }
 
 void node(char name[]){
@@ -422,16 +427,16 @@ void node(char name[]){
             int answer;
             printf("should I wait? or syncing (or request file)? ~ '-1' or '1' or '0'");
             scanf(" %d", answer);
-            if(answer == -1 ){
+
                 //Создаём тред который слушай на синхрон
                 pthread_create(&master_threads[thread_counter], NULL, server_thread, &thread_args[0]);
-
-            }else{
+                thread_counter++;
                 //Создаём тред который идет по бд и отправляет сигнал на синхрон
                 pthread_create(&master_threads[thread_counter], NULL, client_thread, &thread_args[0]);
-            }
+                thread_counter++;
 
             pthread_join(master_threads[0], NULL);
+            pthread_join(master_threads[1], NULL);
         }
         //Создаём тред который запрашивает файлы (в Гуи)
 
